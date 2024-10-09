@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Blog</h1>
+
+<h2>Your Posts</h2>
+{% if your_posts %}
+    {% for post in your_posts %}
+        <li>
+            <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
+            <p>By {{ post.author.username }} on {{ post.created_at }}</p>
+        </li>
+    {% endfor %}
+{% else %}
+    <p>You have not created any posts yet.</p>
+{% endif %}
+<a href="{% url 'post_create' %}">Create New Post</a>
+
+<h2>Posts from People You Follow</h2>
+{% if following_posts %}
+    {% for post in following_posts %}
+        <li>
+            <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
+            <p>By {{ post.author.username }} on {{ post.created_at }}</p>
+        </li>
+    {% endfor %}
+{% else %}
+    <p>No posts from users you follow.</p>
+{% endif %}
+
+<h2>All Posts</h2>
+
+<form method="GET" action="{% url 'post_search' %}">
+    <input type="text" name="q" placeholder="Search for posts...">
+    <button type="submit">Search</button>
+</form>
+<br>
+
+{% if page_obj %}
+    <ul>
+        {% for post in page_obj %}
+            <li>
+                <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
+                <p>By {{ post.author.username }} on {{ post.created_at }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; first</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% else %}
+    <p>No posts!</p>
+{% endif %}
+
+{% endblock %}
+

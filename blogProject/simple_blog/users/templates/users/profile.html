@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ user.username }}'s Profile</h1>
+<p>Bio: {{ profile.bio }}</p>
+{% if profile.profile_picture %}
+    <img width="100px" height="100px" src="{{ profile.profile_picture.url }}" alt="{{ user.username }}'s profile picture">
+{% else %}
+    <p>No profile picture available.</p>
+{% endif %}
+
+<h3>Followers ({{ user.followers.count }})</h3>
+<ul>
+    {% for follow in user.followers.all %}
+        <li><a href="{% url 'profile' follow.follower.username %}">{{ follow.follower.username }}</a></li>
+    {% endfor %}
+</ul>
+
+<h3>Following ({{ user.following.count }})</h3>
+<ul>
+    {% for follow in user.following.all %}
+        <li><a href="{% url 'profile' follow.following.username %}">{{ follow.following.username }}</a></li>
+    {% endfor %}
+</ul>
+
+{% if request.user == user %}
+    <a href="{% url 'edit_profile' user.username %}">Edit Profile</a>
+{% endif %}
+
+{% if request.user != user %}
+    {% if is_following %}
+        <form method="post" action="{% url 'unfollow_user' user.username%}">
+            {% csrf_token %}
+            <button type="submit">Unfollow</button>
+        </form>
+    {% else %}
+        <form method="post" action="{% url 'follow_user' user.username %}">
+            {% csrf_token %}
+            <button type="submit">Follow</button>
+        </form>
+    {% endif %}
+{% endif %}
+{% endblock %}
